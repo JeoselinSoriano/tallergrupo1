@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -40,12 +41,17 @@ public class MainLocalizacion extends Activity {
             btnDesactivar = (Button) findViewById(R.id.BtnDesactivar);
             lblLatitud = (TextView) findViewById(R.id.LblPosLatitud);
             lblLongitud = (TextView) findViewById(R.id.LblPosLongitud);
+
+            Time time = new Time();
+            time.setToNow();
+            System.out.println("time: " + time.hour+":"+time.minute);
+
             lblPrecision = (TextView) findViewById(R.id.LblPosPrecision);
             lblEstado = (TextView) findViewById(R.id.LblEstado);
 
-//            Ubicacion ub = new Ubicacion(this);
+            Ubicacion ub = new Ubicacion(this);
             //ub.getStringLocation("Latitud");
-//            lblLatitud.setText("Latitud: " +  ub.getStringLocation("Latitud"));
+            lblLatitud.setText("Latitud: " +  ub.getStringLocation("Latitud"));
 
             btnActualizar.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -129,18 +135,23 @@ public class MainLocalizacion extends Activity {
 
 
     private void mostrarPosicion(Location loc) {
+
+        Time time = new Time();
+        time.setToNow();
+        System.out.println("time: " + time.hour+":"+time.minute);
+
         if(loc != null)
         {
             lblLatitud.setText("Latitud: " + String.valueOf(loc.getLatitude()));
             lblLongitud.setText("Longitud: " + String.valueOf(loc.getLongitude()));
-            lblPrecision.setText("Precision: " + String.valueOf(loc.getAccuracy()));
+            lblPrecision.setText("Hora: " + time.hour+":"+time.minute);
             Log.i("", String.valueOf(loc.getLatitude() + " - " + String.valueOf(loc.getLongitude())));
         }
         else
         {
             lblLatitud.setText("Latitud: (sin_datos)");
             lblLongitud.setText("Longitud: (sin_datos)");
-            lblPrecision.setText("Precision: (sin_datos)");
+            lblPrecision.setText(time.hour+":"+time.minute);
         }
     }
 }
