@@ -18,7 +18,7 @@ public class MyDataBase extends SQLiteOpenHelper{
     public static final String DATABASE_NAME = "SQLiteGPS.db";
     private static final int DATABASE_VERSION = 1;
     public static final String GPS_TABLE_NAME = "gpslocation";
-    public static final String GPS_COLUMN_ID = "_id";
+    public static final String GPS_COLUMN_ID = "id";
     public static final String GPS_COLUMN_LAT = "latitud";
     public static final String GPS_COLUMN_LONG = "longitud";
     public static final String GPS_COLUMN_TIME = "tiempo";

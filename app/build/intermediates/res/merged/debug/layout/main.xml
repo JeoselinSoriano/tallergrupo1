@@ -24,7 +24,7 @@
         android:background="#aaaaaa"
         android:textColor="#000000" />
 
-    <TextView android:id="@+id/LblPosPrecision"
+    <TextView android:id="@+id/LblPosHora"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dip"

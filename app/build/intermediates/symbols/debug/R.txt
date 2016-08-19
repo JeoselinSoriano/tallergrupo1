@@ -488,9 +488,9 @@ int id BtnActualizar 0x7f0b0058
 int id BtnDesactivar 0x7f0b0059
 int id LblEst 0x7f0b005a
 int id LblEstado 0x7f0b005b
+int id LblPosHora 0x7f0b0057
 int id LblPosLatitud 0x7f0b0055
 int id LblPosLongitud 0x7f0b0056
-int id LblPosPrecision 0x7f0b0057
 int id LblPosicion 0x7f0b0054
 int id action0 0x7f0b005c
 int id action_bar 0x7f0b0045

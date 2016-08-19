@@ -4,6 +4,7 @@ package com.example.romy.gpsfinal;
 
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,6 +15,26 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
+
+
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+
+
 
 public class MainLocalizacion extends Activity {
 
@@ -23,10 +44,17 @@ public class MainLocalizacion extends Activity {
     private Button btnDesactivar;
     private TextView lblLatitud;
     private TextView lblLongitud;
-    private TextView lblPrecision;
+    private TextView lblHora;
     private TextView lblEstado;
 
 
+//  URL Servico Web
+    private static final String URL_GRABA = "http://localhost/webservice/ubicacion.php/";
+    private static final String URL_CONSULTA = "http://localhost/webservice/consultar.php";
+    private static final String TAG = MainLocalizacion.class.getSimpleName();
+
+
+//
     private LocationManager locManager;
     private LocationListener locListener;
 
@@ -46,7 +74,7 @@ public class MainLocalizacion extends Activity {
             time.setToNow();
             System.out.println("time: " + time.hour+":"+time.minute);
 
-            lblPrecision = (TextView) findViewById(R.id.LblPosPrecision);
+            lblHora = (TextView) findViewById(R.id.LblPosHora);
             lblEstado = (TextView) findViewById(R.id.LblEstado);
 
             Ubicacion ub = new Ubicacion(this);
@@ -111,10 +139,6 @@ public class MainLocalizacion extends Activity {
                     lblEstado.setText("Provider Status: " + status);
                 }
 
-
-
-
-
             };
 
             locManager.requestLocationUpdates(
@@ -144,14 +168,129 @@ public class MainLocalizacion extends Activity {
         {
             lblLatitud.setText("Latitud: " + String.valueOf(loc.getLatitude()));
             lblLongitud.setText("Longitud: " + String.valueOf(loc.getLongitude()));
-            lblPrecision.setText("Hora: " + time.hour+":"+time.minute);
-            Log.i("", String.valueOf(loc.getLatitude() + " - " + String.valueOf(loc.getLongitude())));
+            lblHora.setText("Hora: " + time.hour+":"+time.minute);
+            Log.i("", String.valueOf(loc.getLatitude() + " - " + String.valueOf(loc.getLongitude() + " - " + String.valueOf(loc.getTime()))));
         }
         else
         {
             lblLatitud.setText("Latitud: (sin_datos)");
             lblLongitud.setText("Longitud: (sin_datos)");
-            lblPrecision.setText(time.hour+":"+time.minute);
+            lblHora.setText(time.hour+":"+time.minute);
         }
     }
+
+
+
+
+
+
+// Datos para el servicio web
+
+    public void insertLocation (View v){
+        String latitud = this.lblLatitud.getText().toString();
+        String longitud = this.lblLongitud.getText().toString();
+        String hora = this.lblHora.getText().toString();
+        if(!latitud.equals("") && !longitud.equals("") && !hora.equals("")){
+            insertOnServer(latitud,longitud,hora);
+        }else{
+            Toast.makeText(getApplicationContext(),
+                    "Llena todos los campos",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void insertOnServer(final String lat, final String lon, final String hor){
+        VolleyInstancia.getInstance(this).addToRequestQueue(
+                new StringRequest(DownloadManager.Request.Method.POST, URL_GRABA,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                try{
+                                    JSONObject oJson = new JSONObject(response);
+                                    Log.d(TAG, oJson.toString());
+                                    procesarRespuesta(oJson);
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.d(TAG, "ERROR VOLLEY: " + error.getMessage());
+                            }
+                        }
+                ){
+                    @Override
+                    protected Map<String,String> getParams()throws AuthFailureError {
+                        Map<String,String> parameters = new HashMap<>();
+                        parameters.put("latitud",lat);
+                        parameters.put("longitud",lon);
+                        parameters.put("hora",hor);
+                        return parameters;
+                    }
+                }
+        );
+    }
+
+    private void procesarRespuesta(JSONObject response){
+        try{
+            String estado = response.getString("estado");
+            String mensaje = response.getString("mensaje");
+            switch (estado) {
+                case "1":
+                    Toast.makeText(getApplicationContext(),
+                            mensaje,Toast.LENGTH_SHORT).show();
+                    break;
+                case "2":
+                    Toast.makeText(getApplicationContext(),
+                            mensaje,Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void consultar(View v){
+        VolleyInstancia.getInstance(this).addToRequestQueue(
+                new JsonObjectRequest(Request.Method.POST, URL_CONSULTA,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                JSONArray jsonArray;
+                                try {
+                                    jsonArray = response.getJSONArray("horas");
+                                    for(int i=0; i<jsonArray.length(); i++){
+                                        try{
+                                            JSONObject objeto= jsonArray.getJSONObject(i);
+                                            if(!objeto.getString("hora").equals("")) {
+                                                Log.d(TAG, "Latitud " + objeto.getString("latitud"));
+                                                Log.d(TAG, "Longitud " + objeto.getString("longitud"));
+                                                Log.d(TAG, "Hora " + objeto.getString("hora"));
+                                            }
+                                        }catch (JSONException e) {
+                                            Log.e(TAG, "Error de parsing: "+ e.getMessage());
+                                        }
+                                    }
+                                }catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.d(TAG, "ERROR VOLLEY: " + error.getMessage());
+                            }
+                        }
+                ));
+    }
+
+
+
+
+
+
+
+
 }

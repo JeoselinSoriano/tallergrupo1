@@ -33,7 +33,7 @@ public class Ubicacion implements LocationListener {
         getLocation();
 
     }
-    void getLocation(){
+    public void getLocation(){
 
         System.out.println("PREGUNTo");
         if(networkOn){

@@ -1781,9 +1781,9 @@ containing a value of this type.
         public static final int BtnDesactivar=0x7f0b0059;
         public static final int LblEst=0x7f0b005a;
         public static final int LblEstado=0x7f0b005b;
+        public static final int LblPosHora=0x7f0b0057;
         public static final int LblPosLatitud=0x7f0b0055;
         public static final int LblPosLongitud=0x7f0b0056;
-        public static final int LblPosPrecision=0x7f0b0057;
         public static final int LblPosicion=0x7f0b0054;
         public static final int action0=0x7f0b005c;
         public static final int action_bar=0x7f0b0045;
